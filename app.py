@@ -18,4 +18,4 @@ def get_evento_por_data(data):
     evento = [e for e in eventos if e["data"] == data]
     if evento:
         return jsonify(evento)
-    return jsonify({"erro": "Nen
+return jsonify({"erro": "Nenhum evento encontrado"})
