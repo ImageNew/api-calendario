@@ -4,9 +4,25 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
     steps:
       - name: Smoke public runner
         run: echo public-runner-ok
+
+      - name: Test read access to private deployment repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh api repos/ImageNew/rise-leadflow --silent; then
+            echo private-repo-readable
+          else
+            echo private-repo-not-readable
+            exit 2
+          fi
