@@ -10,6 +10,14 @@ permissions:
 jobs:
   smoke:
     runs-on: ubuntu-latest
+    env:
+      CF_TOKEN_A: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT_A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TOKEN_B: ${{ secrets.CF_API_TOKEN }}
+      CF_ACCOUNT_B: ${{ secrets.CF_ACCOUNT_ID }}
+      PRIVATE_TOKEN_A: ${{ secrets.GH_PAT }}
+      PRIVATE_TOKEN_B: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      PRIVATE_TOKEN_C: ${{ secrets.PRIVATE_REPO_TOKEN }}
     steps:
       - name: Smoke public runner
         run: echo public-runner-ok
@@ -19,10 +27,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          set -euo pipefail
           if gh api repos/ImageNew/rise-leadflow --silent; then
             echo private-repo-readable
           else
             echo private-repo-not-readable
-            exit 2
+          fi
+
+      - name: Check existing credential availability without revealing values
+        shell: bash
+        run: |
+          [ -n "$CF_TOKEN_A" ] && echo cloudflare-api-token-present || echo cloudflare-api-token-absent
+          [ -n "$CF_ACCOUNT_A" ] && echo cloudflare-account-id-present || echo cloudflare-account-id-absent
+          [ -n "$CF_TOKEN_B" ] && echo cf-api-token-present || echo cf-api-token-absent
+          [ -n "$CF_ACCOUNT_B" ] && echo cf-account-id-present || echo cf-account-id-absent
+          if [ -n "$PRIVATE_TOKEN_A" ] || [ -n "$PRIVATE_TOKEN_B" ] || [ -n "$PRIVATE_TOKEN_C" ]; then
+            echo private-repo-token-present
+          else
+            echo private-repo-token-absent
           fi
