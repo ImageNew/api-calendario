@@ -1,0 +1,12 @@
+name: Public runner diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Smoke public runner
+        run: echo public-runner-ok
